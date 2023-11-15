@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script type="text/javascript" src="./Jquery/jquery.js"></script>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #display-form {
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            max-width: 600px;
+            height: auto;
+            max-height: 400px;
+            overflow: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #save, #showForm {
+            color: #fff;
+            background-color: #4caf50;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #save:hover, #showForm:hover {
+            background-color: #45a049;
+        }
+
+        #todoList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #todoList li {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 50px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>ToDo List</h1>
+
+    <ul id="todoList">
+        <!-- Existing tasks will be displayed here -->
+    </ul>
+
+    <button id="showForm">Add Task</button>
+
+    <div class="modal" id="display-form">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <!-- Rest of your modal content -->
+            <h2>Add Task</h2>
+            <form id="formdata">
+                <input type="date" id="date" required>
+                <input type="text" id="task" placeholder="Enter Task" required>
+                <button type="submit" id="save">Save</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+         function closeModal() {
+            document.getElementById('display-form').style.display = 'none';
+        }
+$(document).ready(function () {
+    // Load existing tasks on page load
+    loadExistingTasks();
+
+    // Show modal form on button click
+    $("#showForm").click(function () {
+        $("#display-form").show();
+    });
+
+    // Submit form data via AJAX
+    $("#formdata").submit(function (e) {
+        e.preventDefault();
+        var date = $("#date").val();
+        var task = $("#task").val();
+        $.ajax({
+            type: "POST",
+            url: "save_data.php",
+            data: {
+                action: "insert",
+                date: date,
+                task: task
+            },
+            success: function (data) {
+                $("#display-form").hide();
+                loadExistingTasks(); // Refresh tasks after adding
+                $("#date").val('');
+                $("#task").val('');
+            }
+        });
+    });
+});
+
+// Function to load existing tasks
+function loadExistingTasks() {
+    $.ajax({
+        url: "save_data.php",
+        type: "POST",
+        data: { action: "select" },
+        success: function (data) {
+            $("#todoList").html(data);
+        }
+    });
+}
+
+
+//         $(document).ready(function(){
+//     $("#btn").click(function(){
+//         $("#display-form").show();
+//         loadExistingData();
+//     });
+
+//     $("#save").click(function(){
+//         var date = $("#date").val();
+//         var task = $("#task").val(); // Corrected selector here
+
+//         $.ajax({
+//             type: "POST",
+//             url: "save_data.php",
+//             data: {
+//                 action: "insert",
+//                 date: date,
+//                 task: task
+//             },
+//             success: function(response){
+//                 $("#date").val('');
+//                 $("#task").val('');
+//                 loadExistingData();
+//             },
+//             error: function(error){
+//                 console.log(error);
+//             }
+//         });
+//     });
+
+//     function loadExistingData(){
+//         $.ajax({
+//             type: "POST",
+//             url: "save_data.php",
+//             data:{
+//                 action: "select"
+//             },
+//             success: function(response){
+//                 $("#abc").html(response);
+//             },
+//             error: function(error){
+//                 console.log(error);
+//             }
+//         });
+//     }
+// });
+    </script>
+</body>
+
+</html>
